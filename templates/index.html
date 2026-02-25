@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌀 JUBAYER TOOLS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: radial-gradient(circle at 20% 20%, #1a1f35, #0b0e1a); font-family: 'Rajdhani', sans-serif; color: #e0f2fe; min-height: 100vh; overflow-x: hidden; }
+        .shake { animation: shake 0.4s ease-in-out; border-color: #ff4444 !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .success-pulse { animation: pulse 0.5s ease-out; border-color: #00ff00 !important; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .circle-frame { border-radius: 50%; border: 4px solid #00ffff; box-shadow: 0 8px 0 #004488, 0 0 20px cyan; overflow: hidden; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .circle-card:hover .circle-frame { transform: scale(1.1) rotate(3deg); border-color: #ff44ff; box-shadow: 0 8px 0 #880088, 0 0 30px magenta; }
+        .pixel-input { background: #01101c; border: 2px solid #00ffff; border-radius: 12px; padding: 12px; color: white; width: 100%; transition: 0.3s; text-align: center; }
+        .pixel-input:focus { outline: none; border-color: #ff44ff; box-shadow: 0 0 15px #ff44ff55; }
+        .modal-box { background: rgba(10, 20, 30, 0.95); backdrop-filter: blur(15px); border: 2px solid #00ffff; border-radius: 30px; box-shadow: 0 0 40px rgba(0,255,255,0.2); }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-wrap justify-between items-center gap-4 mb-12">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-tr from-cyan-500 to-fuchsia-500 rounded-xl flex items-center justify-center border-2 border-white shadow-lg">
+                    <i class="fas fa-atom text-black text-xl"></i>
+                </div>
+                <h1 class="font-['Orbitron'] text-3xl font-black tracking-tighter text-cyan-400">JUBAYER<span class="text-white">/TOOLS</span></h1>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div id="viewDisplay" class="bg-cyan-900/30 border border-cyan-500/30 px-5 py-2 rounded-full hidden items-center gap-3">
+                    <i class="fas fa-eye text-cyan-400"></i>
+                    <span id="viewCount" class="font-bold font-['Orbitron'] text-sm tracking-widest text-cyan-100">000</span>
+                </div>
+                <div id="authArea"></div>
+            </div>
+        </header>
+
+        <div id="adminPanel" class="mb-10 hidden flex flex-wrap gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
+            <button onclick="openModal('addModal')" class="bg-cyan-600 hover:bg-cyan-500 px-6 py-2 rounded-xl font-bold text-xs transition-all"><i class="fas fa-plus mr-2"></i> NEW IMAGE</button>
+            <button onclick="openModal('passModal')" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-xl font-bold text-xs transition-all"><i class="fas fa-shield-alt mr-2"></i> UPDATE KEY</button>
+        </div>
+
+        <div id="container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-12"></div>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-[100] p-4">
+        <div class="modal-box p-10 w-full max-w-sm text-center">
+            <h2 class="font-['Orbitron'] text-fuchsia-400 mb-8 tracking-widest">ADMIN AUTH</h2>
+            <input type="password" id="adminPassInput" class="pixel-input mb-8" placeholder="••••••••">
+            <button onclick="handleLogin()" class="w-full bg-cyan-500 py-3 rounded-xl text-black font-bold uppercase tracking-widest hover:bg-white transition-all">Connect</button>
+            <button onclick="closeModal('loginModal')" class="mt-4 text-gray-500 text-xs uppercase">Cancel</button>
+        </div>
+    </div>
+
+    <div id="passModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-[100] p-4">
+        <div class="modal-box p-10 w-full max-w-sm">
+            <h2 class="font-['Orbitron'] text-cyan-300 mb-6 text-center">NEW ADMIN KEY</h2>
+            <input type="password" id="newKeyInput" class="pixel-input mb-6" placeholder="NEW KEY">
+            <div class="flex gap-3">
+                <button onclick="closeModal('passModal')" class="flex-1 bg-gray-800 py-3 rounded-xl font-bold">BACK</button>
+                <button onclick="updateKey()" class="flex-1 bg-fuchsia-600 py-3 rounded-xl font-bold">UPDATE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="unlockModal" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-[110] p-4">
+        <div class="modal-box p-10 w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-yellow-500">
+                <i class="fas fa-lock text-yellow-500 text-2xl"></i>
+            </div>
+            <h2 class="font-['Orbitron'] text-yellow-400 mb-6 uppercase tracking-tighter">Enter Pin</h2>
+            <input type="password" id="unlockInput" class="pixel-input mb-8 text-2xl tracking-[0.5em]" placeholder="****">
+            <div class="flex gap-3">
+                <button onclick="closeModal('unlockModal')" class="flex-1 bg-gray-800 py-3 rounded-xl font-bold">EXIT</button>
+                <button onclick="verifyAndOpen()" class="flex-1 bg-yellow-500 text-black py-3 rounded-xl font-bold">UNLOCK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[100] p-4">
+        <div class="modal-box p-10 w-full max-w-md">
+            <h2 class="font-['Orbitron'] text-cyan-300 mb-6 uppercase">Nexus Addition</h2>
+            <div class="space-y-4">
+                <input type="text" id="addTitle" placeholder="NAME" class="pixel-input">
+                <input type="text" id="addImgUrl" placeholder="IMAGE URL" class="pixel-input">
+                <input type="text" id="addTargetUrl" placeholder="REDIRECT LINK" class="pixel-input">
+                <input type="text" id="addPass" placeholder="SECURITY PIN (OPTIONAL)" class="pixel-input">
+                <button onclick="saveNewEntry()" class="w-full bg-cyan-500 py-4 rounded-xl text-black font-bold uppercase mt-4">Initialize Data</button>
+                <button onclick="closeModal('addModal')" class="w-full text-gray-500 py-2">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let state = { images: [], isAdmin: false, currentImg: null };
+
+        async function init() {
+            const res = await fetch('/api/data');
+            const data = await res.json();
+            state.images = data.images;
+            state.isAdmin = data.is_admin;
+            
+            // view
+            const viewDisplay = document.getElementById('viewDisplay');
+            if (state.isAdmin) {
+                document.getElementById('viewCount').innerText = data.total_views.toString().padStart(3, '0');
+                viewDisplay.classList.remove('hidden');
+                viewDisplay.classList.add('flex');
+            } else {
+                viewDisplay.classList.add('hidden');
+            }
+            
+            render();
+        }
+
+        function render() {
+            const cont = document.getElementById('container');
+            const auth = document.getElementById('authArea');
+            const panel = document.getElementById('adminPanel');
+
+            cont.innerHTML = state.images.map((img, i) => `
+                <div class="circle-card flex flex-col items-center cursor-pointer group" onclick="handleCardClick(${i})">
+                    <div class="relative">
+                        <div class="circle-frame w-32 h-32 md:w-36 md:h-36">
+                            <img src="${img.imgUrl}" class="w-full h-full object-cover">
+                        </div>
+                        ${img.pass ? '<div class="absolute top-0 left-0 bg-yellow-500 w-8 h-8 rounded-full flex items-center justify-center text-black text-[10px] border-2 border-white shadow-xl"><i class="fas fa-lock"></i></div>' : ''}
+                        ${state.isAdmin ? `<button onclick="event.stopPropagation(); deleteImg(${i})" class="absolute -top-2 -right-2 bg-red-600 w-8 h-8 rounded-full border-2 border-white shadow-lg hover:bg-red-400 transition-colors"><i class="fas fa-times text-xs"></i></button>` : ''}
+                    </div>
+                    <p class="mt-5 font-['Orbitron'] text-[10px] font-bold text-cyan-300 tracking-[0.2em] uppercase group-hover:text-fuchsia-400 transition-colors">${img.title}</p>
+                </div>
+            `).join('');
+
+            auth.innerHTML = state.isAdmin ? 
+                `<button onclick="logout()" class="text-[10px] font-bold border border-red-500 text-red-500 px-5 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all">SYSTEM LOGOUT</button>` : 
+                `<button onclick="openModal('loginModal')" class="text-[10px] font-bold border border-cyan-500 text-cyan-400 px-5 py-2 rounded-full hover:bg-cyan-500 hover:text-black transition-all uppercase tracking-widest">Admin Access</button>`;
+            
+            panel.classList.toggle('hidden', !state.isAdmin);
+        }
+
+        // noisheare
+         (handleLogin, updateKey, verifyAndOpen, saveNewEntry, deleteImg, logout, openModal, closeModal)
+        async function handleLogin() {
+            const input = document.getElementById('adminPassInput');
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({password: input.value})
+            });
+            if(res.ok) {
+                input.classList.add('success-pulse');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                input.classList.add('shake');
+                setTimeout(() => { input.classList.remove('shake'); input.value=''; }, 400);
+            }
+        }
+
+        async function updateKey() {
+            const val = document.getElementById('newKeyInput').value;
+            const res = await fetch('/api/change_pass', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({new_password: val})
+            });
+            if(res.ok) { alert("ADMIN KEY UPDATED"); closeModal('passModal'); }
+        }
+
+        function handleCardClick(i) {
+            state.currentImg = state.images[i];
+            if(state.isAdmin || !state.currentImg.pass) {
+                window.open(state.currentImg.targetUrl || state.currentImg.imgUrl, '_blank');
+            } else {
+                openModal('unlockModal');
+            }
+        }
+
+        function verifyAndOpen() {
+            const input = document.getElementById('unlockInput');
+            if(input.value === state.currentImg.pass) {
+                input.classList.add('success-pulse');
+                setTimeout(() => {
+                    window.open(state.currentImg.targetUrl || state.currentImg.imgUrl, '_blank');
+                    closeModal('unlockModal');
+                }, 500);
+            } else {
+                input.classList.add('shake');
+                setTimeout(() => { input.classList.remove('shake'); input.value=''; }, 400);
+            }
+        }
+
+        async function saveNewEntry() {
+            const data = {
+                title: document.getElementById('addTitle').value,
+                imgUrl: document.getElementById('addImgUrl').value,
+                targetUrl: document.getElementById('addTargetUrl').value,
+                pass: document.getElementById('addPass').value
+            };
+            await fetch('/api/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            closeModal('addModal');
+            init();
+        }
+
+        async function deleteImg(i) {
+            if(confirm("Confirm Erasure?")) {
+                await fetch('/api/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({index: i})
+                });
+                init();
+            }
+        }
+
+        async function logout() { await fetch('/api/logout'); location.reload(); }
+
+        function openModal(id) { 
+            document.getElementById(id).classList.remove('hidden'); 
+            const inp = document.getElementById(id).querySelector('input');
+            if(inp) inp.focus();
+        }
+        function closeModal(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+            const inps = document.getElementById(id).querySelectorAll('input');
+            inps.forEach(i => { i.value = ''; i.classList.remove('success-pulse'); });
+        }
+
+        init();
+    </script>
+</body>
+</html>
